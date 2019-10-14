@@ -1,5 +1,7 @@
 {
-     
+     "observed-directories": {
+
+     },
      "pdf": {
           "rules": [
                {
@@ -10,7 +12,7 @@
                          "BuK",
                          "BUK"
                     ],
-                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
+                    "destination": "/Users/jonahschueller/development/python/FileMove"
                }
           ]
      },
@@ -18,15 +20,15 @@
           "rules": [
                {
                     "contains-keyword": [
-                         "Hello"
+                         "(Hello|Hallo)"
                     ],
-                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
+                    "destination": "/Users/jonahschueller/development/python/FileMove"
                },
                {
                     "contains-keyword": [
                          "Hi"
                     ],
-                    "destination": "/Users/jonahschueller/GoogleDrive/RWTH/SoSe-19/FoSAP"
+                    "destination": "/Users/jonahschueller/development/python/FileMove"
                }
           ]
           

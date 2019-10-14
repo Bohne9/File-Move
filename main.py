@@ -29,16 +29,24 @@ class MyHandler(FileSystemEventHandler):
                for suf in data:
                     # print(suf)
                     if path_suffix == suf:
-                         rule = self.contains(path, path_suffix, data[suf]) 
-                         dest = rule['destination']
-                         print(f'Matched! Move file {path} to {dest}')
+                         rule = self.contains(path, path_suffix, data[suf])
+                         if rule:
+                              dest = rule['destination']
+                              print(f'Matched! Move file {path} to {dest}')
+                              shutil.move(path, dest)
+                         else:
+                              print("No match.")
 
-
+     # Search in the given file if a contains-rule matches
      def contains(self, path, suffix, match):
           with open(path, 'r') as f:
+               # If file is pdf
                if suffix == "pdf":
+                    # Search in the pdf file
                     return self.pdfSearch(path, match)
-               elif suffix == "txt":
+               # If file is textbased
+               elif suffix in ["txt", "c", "java", "swift", "py", "json", "csv"]:
+                    # Search in the file
                     return self.txtSearch(path, match)
 
      def pdfSearch(self, path, match):
@@ -53,29 +61,27 @@ class MyHandler(FileSystemEventHandler):
                PageObj = object.getPage(i)
                # print("this is page " + str(i)) 
                Text = PageObj.extractText() 
-               # print(Text)
+               # For each rule for pdf files
                for rule in match["rules"]:
-
+                    # See if any rules match
                     for key in rule["contains-keyword"]:
                          print(f'Search for {key}')
                          ResSearch = re.search(key, Text)
                          if ResSearch:
+                              # If a rule matches -> return
                               return rule
 
      def txtSearch(self, path, match):
           with open(path, 'r') as f:
+               # Load the content of the file
                data = f.read().replace('\n', '')
-               print(match)
                for rule in match["rules"]:
-                    print(rule)
+                    # See if any rules match
                     for key in rule['contains-keyword']:
-                         if key in data:
+                         ResSearch = re.search(key, data)
+                         if ResSearch:
+                              # If a rule matches -> return
                               return rule
-
-
-
-     # def on_modified(self, event):
-          # print(f'event type: {event.event_type}  path : {event.src_path}')
 
      def on_created(self, event):
           print(f'event type: {event.event_type}  path : {event.src_path}')
@@ -88,8 +94,7 @@ class MyHandler(FileSystemEventHandler):
 
 
 
-def move_file(source, dest):
-     shutil.move(source, dest)
+   
 
 # Main
 if __name__ == "__main__":
