@@ -1,17 +1,34 @@
 {
+     
      "pdf": {
-          "BuK": {
-               "contains-keyword": [
-                    "Berechenbarkeit und Komplexität",
-                    "BerechenbarkeitundKomplexität",
-                    "BerechenbarkeitundKomplexitat",
-                    "BuK",
-                    "BUK"
-               ],
-               "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
-          }
+          "rules": [
+               {
+                    "contains-keyword": [
+                         "Berechenbarkeit und Komplexität",
+                         "BerechenbarkeitundKomplexität",
+                         "BerechenbarkeitundKomplexitat",
+                         "BuK",
+                         "BUK"
+                    ],
+                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
+               }
+          ]
      },
      "txt": {
+          "rules": [
+               {
+                    "contains-keyword": [
+                         "Hello"
+                    ],
+                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
+               },
+               {
+                    "contains-keyword": [
+                         "Hi"
+                    ],
+                    "destination": "/Users/jonahschueller/GoogleDrive/RWTH/SoSe-19/FoSAP"
+               }
+          ]
           
      }
 }
