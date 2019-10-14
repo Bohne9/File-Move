@@ -1,18 +1,26 @@
 {
      "observed-directories": {
-
+          "dirs": [
+               "./test/",
+               "/Users/jonahschueller/Downloads/"
+          ]
      },
      "pdf": {
           "rules": [
                {
+                    "description":"Berechenbarkeit und Komplexität",
                     "contains-keyword": [
-                         "Berechenbarkeit und Komplexität",
-                         "BerechenbarkeitundKomplexität",
-                         "BerechenbarkeitundKomplexitat",
-                         "BuK",
-                         "BUK"
+                         "(?=.*Berechenbarkeit)(?=.*Komplexität)",
+                         "BuK"
                     ],
                     "destination": "/Users/jonahschueller/development/python/FileMove"
+               }, {
+                    "contains-keyword": [
+                         "Softwaretechnik",
+                         "SoftwareEngineering",
+                         "SWT"
+                    ],
+                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/SWT"
                }
           ]
      },

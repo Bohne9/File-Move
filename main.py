@@ -3,8 +3,8 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import shutil
 import json
-import PyPDF2
 import re
+from tika import parser
 
 
 class MyHandler(FileSystemEventHandler):
@@ -29,7 +29,9 @@ class MyHandler(FileSystemEventHandler):
                for suf in data:
                     # print(suf)
                     if path_suffix == suf:
+                         # See if anything matches
                          rule = self.contains(path, path_suffix, data[suf])
+                         # If True -> found something
                          if rule:
                               dest = rule['destination']
                               print(f'Matched! Move file {path} to {dest}')
@@ -50,26 +52,16 @@ class MyHandler(FileSystemEventHandler):
                     return self.txtSearch(path, match)
 
      def pdfSearch(self, path, match):
-          # open the pdf file
-          object = PyPDF2.PdfFileReader(path)
-
-          # get number of pages
-          NumPages = object.getNumPages()
-
-          # extract text and do the search
-          for i in range(0, NumPages):
-               PageObj = object.getPage(i)
-               # print("this is page " + str(i)) 
-               Text = PageObj.extractText() 
-               # For each rule for pdf files
-               for rule in match["rules"]:
-                    # See if any rules match
-                    for key in rule["contains-keyword"]:
-                         print(f'Search for {key}')
-                         ResSearch = re.search(key, Text)
-                         if ResSearch:
-                              # If a rule matches -> return
-                              return rule
+         
+          raw = parser.from_file(path)
+          for rule in match["rules"]:
+               # See if any rules match
+               for key in rule["contains-keyword"]:
+                    print(f'Search for {key}')
+                    ResSearch = re.search(key, raw['content'])
+                    if ResSearch:
+                         # If a rule matches -> return
+                         return rule
 
      def txtSearch(self, path, match):
           with open(path, 'r') as f:
@@ -93,22 +85,32 @@ class MyHandler(FileSystemEventHandler):
 
 
 
-
-   
-
 # Main
 if __name__ == "__main__":
      # Create file Observer
      print("Running 'File Observer'")
+     observers = []
      event_handler = MyHandler()
      observer = Observer()
      observer.schedule(event_handler, path='./test/', recursive=False)
      observer.start()
+
+     with open("./file-move-rules.json") as f:
+          data = json.load(f)["observed-directories"]["dirs"]
+          for dir in data:
+               observer = Observer()
+               print(f"Observing {dir}")
+               observer.schedule(event_handler, path=dir, recursive=False)
+               observer.start()
+               observers.append(observer)
 
      try:
           while True:
                time.sleep(1)
      except KeyboardInterrupt:
           print("Terminating 'File Observer'")
-          observer.stop()
-     observer.join()
+          for observer in observers:
+               observer.stop()
+     
+     for observer in observers:
+          observer.join()
