@@ -21,6 +21,11 @@
                          "SWT"
                     ],
                     "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/SWT"
+               }, {
+                    "contains-keyword": [
+                         "(?=.*Praktikum)(?=.*Systemprogrammierung)"
+                    ],
+                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/PSP"
                }
           ]
      },

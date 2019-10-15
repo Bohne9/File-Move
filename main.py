@@ -5,6 +5,13 @@ import shutil
 import json
 import re
 from tika import parser
+import logging
+
+#TODO:
+# - Logging
+# - Fix crash when file already exists in destination directory
+# - Add more types
+# - Add support for file name matches
 
 
 class MyHandler(FileSystemEventHandler):
@@ -34,8 +41,9 @@ class MyHandler(FileSystemEventHandler):
                          # If True -> found something
                          if rule:
                               dest = rule['destination']
-                              print(f'Matched! Move file {path} to {dest}')
-                              shutil.move(path, dest)
+                              # print(f'Matched! Move file {path} to {dest}')
+                              # shutil.move(path, dest)
+                              self.move_file(path, dest)
                          else:
                               print("No match.")
 
@@ -47,17 +55,22 @@ class MyHandler(FileSystemEventHandler):
                     # Search in the pdf file
                     return self.pdfSearch(path, match)
                # If file is textbased
-               elif suffix in ["txt", "c", "java", "swift", "py", "json", "csv"]:
+               # elif suffix in ["txt", "c", "java", "swift", "py", "json", "csv"]:
+               elif suffix == "txt":
                     # Search in the file
                     return self.txtSearch(path, match)
 
+
      def pdfSearch(self, path, match):
-         
+          # parse file
           raw = parser.from_file(path)
+          # for each rule in the matching filetype
           for rule in match["rules"]:
                # See if any rules match
                for key in rule["contains-keyword"]:
-                    print(f'Search for {key}')
+                    # print(f'Search for {key}')
+
+                    # Parse the regex rules with the text in the pdf
                     ResSearch = re.search(key, raw['content'])
                     if ResSearch:
                          # If a rule matches -> return
@@ -75,6 +88,10 @@ class MyHandler(FileSystemEventHandler):
                               # If a rule matches -> return
                               return rule
 
+     def move_file(self, source, dest):
+          shutil.move(source, dest)
+          logging.info(f'Moved file {source} to {dest}')
+
      def on_created(self, event):
           print(f'event type: {event.event_type}  path : {event.src_path}')
           self.match(str(event.src_path))
@@ -87,6 +104,8 @@ class MyHandler(FileSystemEventHandler):
 
 # Main
 if __name__ == "__main__":
+     # Config logging
+     logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
      # Create file Observer
      print("Running 'File Observer'")
      observers = []
