@@ -13,7 +13,7 @@
                          "(?=.*Berechenbarkeit)(?=.*Komplexität)",
                          "BuK"
                     ],
-                    "destination": "/Users/jonahschueller/development/python/FileMove"
+                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
                }, {
                     "contains-keyword": [
                          "Softwaretechnik",
@@ -29,7 +29,7 @@
                }
           ]
      },
-     "txt": {
+     "(txt|c)": {
           "rules": [
                {
                     "contains-keyword": [

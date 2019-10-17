@@ -6,13 +6,17 @@ import json
 import re
 from tika import parser
 import logging
+import os.path as fs
+import os
 
 #TODO:
 # - Logging
 # - Fix crash when file already exists in destination directory
 # - Add more types
 # - Add support for file name matches
-
+home = fs.expanduser("~")
+file_move_json = home + "/.file_move/file-move.json"
+log_file = home + "/.file_move/logs/app.log"
 
 class MyHandler(FileSystemEventHandler):
 
@@ -32,10 +36,11 @@ class MyHandler(FileSystemEventHandler):
           with open('./file-move-rules.json', 'r') as rules:
                # Load JSON data
                data = json.load(rules)
-               print(f"Loaded rules...{data}")
+               print(f'Loaded rules...{data}')
                for suf in data:
                     # print(suf)
-                    if path_suffix == suf:
+                    # if path_suffix == suf:
+                    if re.search(suf, path_suffix):
                          # See if anything matches
                          rule = self.contains(path, path_suffix, data[suf])
                          # If True -> found something
@@ -56,9 +61,11 @@ class MyHandler(FileSystemEventHandler):
                     return self.pdfSearch(path, match)
                # If file is textbased
                # elif suffix in ["txt", "c", "java", "swift", "py", "json", "csv"]:
-               elif suffix == "txt":
+               elif re.search("(txt|c)", suffix):
                     # Search in the file
                     return self.txtSearch(path, match)
+               else:
+                    print("Something is wrong")
 
 
      def pdfSearch(self, path, match):
@@ -100,21 +107,27 @@ class MyHandler(FileSystemEventHandler):
           print(f'event type: {event.event_type}  path : {event.src_path}')
           self.match(str(event.src_path))
 
+def start_routine():
+     if not fs.isdir(home + "/.file_move"):
+          os.mkdir(home + "/.file_move")
+          
+          os.mkdir(home + "/.file_move/logs")
 
 
 # Main
 if __name__ == "__main__":
+     start_routine()
      # Config logging
-     logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+     logging.basicConfig(filename=log_file, filemode='a', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
      # Create file Observer
      print("Running 'File Observer'")
      observers = []
      event_handler = MyHandler()
-     observer = Observer()
-     observer.schedule(event_handler, path='./test/', recursive=False)
-     observer.start()
+     # observer = Observer()
+     # observer.schedule(event_handler, path='./test/', recursive=False)
+     # observer.start()
 
-     with open("./file-move-rules.json") as f:
+     with open(file_move_json, 'r+') as f:
           data = json.load(f)["observed-directories"]["dirs"]
           for dir in data:
                observer = Observer()
