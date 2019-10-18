@@ -95,9 +95,38 @@ class MyHandler(FileSystemEventHandler):
                               # If a rule matches -> return
                               return rule
 
+     # Move file to destination and log that move in app.log
      def move_file(self, source, dest):
-          shutil.move(source, dest)
-          logging.info(f'Moved file {source} to {dest}')
+          # Split parts of the file url
+          path_parts = source.split("/")
+
+          # In case path_parts is empty
+          if not path_parts or len(path_parts) == 0:
+               return
+          # Get last path element
+          file_name = path_parts[-1]
+
+          # Check if the file already exists
+          if not fs.exists(dest + '/' + file_name):
+               # File doesn't exists yet -> file can be moved safely
+               shutil.move(source, dest)
+               # Log the move of the file
+               logging.info(f'Moved file {source} to {dest}')
+          # File already exists -> modify path
+          else:
+               ext = 1
+               # Split file_name and file_suffix
+               file_n, file_s = file_name.rsplit(".")
+
+               # Generate filenames as long as file_name (n) exists
+               while fs.exists(dest + '/' + file_n + '(' + str(ext) + ').' + file_s):
+                    ext += 1
+               # Now the file name doesn't exist -> move file
+               dest = dest + '/' + file_n + '(' + str(ext) + ').' + file_s
+               # Move file
+               shutil.move(source, dest)
+               # Log file move
+               logging.info(f'Moved file {source} to {dest}')
 
      def on_created(self, event):
           print(f'event type: {event.event_type}  path : {event.src_path}')
@@ -107,6 +136,8 @@ class MyHandler(FileSystemEventHandler):
           print(f'event type: {event.event_type}  path : {event.src_path}')
           self.match(str(event.src_path))
 
+
+# Creates dirs and files if "~/.file_move" not exists
 def start_routine():
      if not fs.isdir(home + "/.file_move"):
           os.mkdir(home + "/.file_move")
@@ -114,7 +145,7 @@ def start_routine():
           os.mkdir(home + "/.file_move/logs")
 
 
-# Main
+# Run this only if this file is the main file
 if __name__ == "__main__":
      start_routine()
      # Config logging
@@ -127,6 +158,7 @@ if __name__ == "__main__":
      # observer.schedule(event_handler, path='./test/', recursive=False)
      # observer.start()
 
+     # Add observer for all observing directories
      with open(file_move_json, 'r+') as f:
           data = json.load(f)["observed-directories"]["dirs"]
           for dir in data:
