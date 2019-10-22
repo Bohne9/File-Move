@@ -1,6 +1,6 @@
 import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+# from watchdog.observers import Observer
+# from watchdog.events import FileSystemEventHandler
 import shutil
 import json
 import re
@@ -10,13 +10,24 @@ import os.path as fs
 import os
 
 # TODO:
+# - Add support for hot reloading ~/.file_move/file_move.json
 #  - Add support more types
 
 home = fs.expanduser("~")
 file_move_json = home + "/.file_move/file-move.json"
 log_file = home + "/.file_move/logs/app.log"
 
-class MyHandler(FileSystemEventHandler):
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+class MyHandler:
 
      def match(self, path):
           # Look for the suffix of the path
@@ -138,12 +149,24 @@ class MyHandler(FileSystemEventHandler):
           self.match(str(event.src_path))
 
 
+def is_dir(path):
+     return fs.isdir(path)
+
+def is_file(path):
+     return fs.exists(path)
+
 # Creates dirs and files if "~/.file_move" not exists
 def start_routine():
-     if not fs.isdir(home + "/.file_move"):
+     if not is_dir(home + "/.file_move"):
           os.mkdir(home + "/.file_move")
-          
+     
+     if not is_dir(home + "/.file_move/logs"):
           os.mkdir(home + "/.file_move/logs")
+
+     if not is_file(file_move_json):
+          with open(file_move_json, "w") as f:
+               f.write("{\n\t\"observed-directories\": {\n\t\t\"dirs\": [\n\t\t\t\"Replace with the paths to the directories that should be observed.\"\n\t\t]\n\t},\n\t\n}")
+          print(bcolors.WARNING + "Warning: Cd into ~/.file_move/file_move.json and add your observed directories." + bcolors.ENDC)
 
 
 # Run this only if this file is the main file
@@ -155,9 +178,6 @@ if __name__ == "__main__":
      print("Running 'File Observer'")
      observers = []
      event_handler = MyHandler()
-     # observer = Observer()
-     # observer.schedule(event_handler, path='./test/', recursive=False)
-     # observer.start()
 
      # Add observer for all observing directories
      with open(file_move_json, 'r+') as f:
