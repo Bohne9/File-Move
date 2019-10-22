@@ -1,1 +1,3 @@
 .DS_Store
+# Ignore txt files
+*.txt

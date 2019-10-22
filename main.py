@@ -9,11 +9,9 @@ import logging
 import os.path as fs
 import os
 
-#TODO:
-# - Logging
-# - Fix crash when file already exists in destination directory
-# - Add more types
-# - Add support for file name matches
+# TODO:
+#  - Add support more types
+
 home = fs.expanduser("~")
 file_move_json = home + "/.file_move/file-move.json"
 log_file = home + "/.file_move/logs/app.log"
@@ -28,15 +26,16 @@ class MyHandler(FileSystemEventHandler):
           if not suffix:
                # TODO: Logging
                print("no suffix")
+               logging.warning(f"No suffix found in file '{path}'. Something is wrong...")
                return
+          # Get suffix of the path
           path_suffix = suffix[-1]
-          print(path_suffix)
 
           # Open the file move rules and look for matching rules
-          with open('./file-move-rules.json', 'r') as rules:
+          with open(file_move_json, 'r') as rules:
                # Load JSON data
                data = json.load(rules)
-               print(f'Loaded rules...{data}')
+               print(f'Loaded rules from file {file_move_json} ...')
                for suf in data:
                     # print(suf)
                     # if path_suffix == suf:
@@ -61,13 +60,14 @@ class MyHandler(FileSystemEventHandler):
                     return self.pdfSearch(path, match)
                # If file is textbased
                # elif suffix in ["txt", "c", "java", "swift", "py", "json", "csv"]:
-               elif re.search("(txt|c)", suffix):
+               elif re.search("(txt|c|java|swift|py|json|csv)", suffix):
                     # Search in the file
                     return self.txtSearch(path, match)
                else:
                     print("Something is wrong")
 
 
+     # Search in pdf file
      def pdfSearch(self, path, match):
           # parse file
           raw = parser.from_file(path)
@@ -83,6 +83,7 @@ class MyHandler(FileSystemEventHandler):
                          # If a rule matches -> return
                          return rule
 
+     # Search in text based files
      def txtSearch(self, path, match):
           with open(path, 'r') as f:
                # Load the content of the file
@@ -118,7 +119,7 @@ class MyHandler(FileSystemEventHandler):
                # Split file_name and file_suffix
                file_n, file_s = file_name.rsplit(".")
 
-               # Generate filenames as long as file_name (n) exists
+               # Generate filenames in format file_name(n).suff as long as they exist
                while fs.exists(dest + '/' + file_n + '(' + str(ext) + ').' + file_s):
                     ext += 1
                # Now the file name doesn't exist -> move file
