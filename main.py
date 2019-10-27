@@ -1,6 +1,6 @@
 import time
-# from watchdog.observers import Observer
-# from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 import shutil
 import json
 import re
@@ -27,7 +27,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-class MyHandler:
+class MyHandler(FileSystemEventHandler):
 
      def match(self, path):
           # Look for the suffix of the path
@@ -56,9 +56,10 @@ class MyHandler:
                          # If True -> found something
                          if rule:
                               dest = rule['destination']
-                              # print(f'Matched! Move file {path} to {dest}')
+                              print(f'Matched! Move file {path} to {dest}')
                               # shutil.move(path, dest)
                               self.move_file(path, dest)
+                              return
                          else:
                               print("No match.")
 
@@ -167,6 +168,11 @@ def start_routine():
           with open(file_move_json, "w") as f:
                f.write("{\n\t\"observed-directories\": {\n\t\t\"dirs\": [\n\t\t\t\"Replace with the paths to the directories that should be observed.\"\n\t\t]\n\t},\n\t\n}")
           print(bcolors.WARNING + "Warning: Cd into ~/.file_move/file_move.json and add your observed directories." + bcolors.ENDC)
+
+class ObserverHandler(FileSystemEventHandler): 
+
+     observers = []
+
 
 
 # Run this only if this file is the main file
