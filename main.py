@@ -11,7 +11,7 @@ import os
 
 # TODO:
 # - Add support for hot reloading ~/.file_move/file_move.json
-#  - Add support more types
+# - Add support more types
 
 home = fs.expanduser("~")
 file_move_json = home + "/.file_move/file-move.json"
@@ -36,7 +36,7 @@ class MyHandler(FileSystemEventHandler):
           # List is empty. Return bc something is wrong with the path
           if not suffix:
                # TODO: Logging
-               print("no suffix")
+               print(bcolors.FAIL + f"No suffix found in file '{path}'. Something is wrong..." + bcolors.ENDC)
                logging.warning(f"No suffix found in file '{path}'. Something is wrong...")
                return
           # Get suffix of the path
@@ -76,7 +76,7 @@ class MyHandler(FileSystemEventHandler):
                     # Search in the file
                     return self.txtSearch(path, match)
                else:
-                    print("Something is wrong")
+                    print(bcolors.FAIL + f"Something is wrong... Seems like the file ({path}) has an unsupported suffix" + bcolors.ENDC)
 
 
      # Search in pdf file
@@ -124,6 +124,7 @@ class MyHandler(FileSystemEventHandler):
                # File doesn't exists yet -> file can be moved safely
                shutil.move(source, dest)
                # Log the move of the file
+               print(bcolors.OKGREEN + f'Moved file {source} to {dest}' + bcolors.ENDC)
                logging.info(f'Moved file {source} to {dest}')
           # File already exists -> modify path
           else:
@@ -139,33 +140,43 @@ class MyHandler(FileSystemEventHandler):
                # Move file
                shutil.move(source, dest)
                # Log file move
+               print(bcolors.OKGREEN + f'Moved file {source} to {dest}' + bcolors.ENDC)
                logging.info(f'Moved file {source} to {dest}')
 
+     # Called when file is created in observed directory
      def on_created(self, event):
           print(f'event type: {event.event_type}  path : {event.src_path}')
           self.match(str(event.src_path))
 
+     # Called when file is moved into observed directory
      def on_moved(self, event):
           print(f'event type: {event.event_type}  path : {event.src_path}')
           self.match(str(event.src_path))
 
-
+# Checks if the given path is a directory
 def is_dir(path):
      return fs.isdir(path)
-
+# Checks if the given path is a file
 def is_file(path):
      return fs.exists(path)
 
 # Creates dirs and files if "~/.file_move" not exists
 def start_routine():
+     # Check if ~/.file_move/ exists
      if not is_dir(home + "/.file_move"):
+          # Create ~/.file_move/ if it doesn't exist
           os.mkdir(home + "/.file_move")
-     
+
+     # Check if ~/.file_move/logs/ exists
      if not is_dir(home + "/.file_move/logs"):
+          # Create ~/.file_move/logs/ if it doesn't exist
           os.mkdir(home + "/.file_move/logs")
 
+     # Check if ~/.file_move/file_move.json exists
      if not is_file(file_move_json):
+          # Create ~/.file_move/file_move.json 
           with open(file_move_json, "w") as f:
+               # Write basic json structure into ~/.file_move/file_move.json
                f.write("{\n\t\"observed-directories\": {\n\t\t\"dirs\": [\n\t\t\t\"Replace with the paths to the directories that should be observed.\"\n\t\t]\n\t},\n\t\n}")
           print(bcolors.WARNING + "Warning: Cd into ~/.file_move/file_move.json and add your observed directories." + bcolors.ENDC)
 
@@ -190,7 +201,7 @@ if __name__ == "__main__":
           data = json.load(f)["observed-directories"]["dirs"]
           for dir in data:
                observer = Observer()
-               print(f"Observing {dir}")
+               print(bcolors.OKGREEN + f"Observing {dir}" + bcolors.ENDC)
                observer.schedule(event_handler, path=dir, recursive=False)
                observer.start()
                observers.append(observer)
