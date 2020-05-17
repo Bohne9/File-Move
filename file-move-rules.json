@@ -1,49 +1,45 @@
 {
-     "observed-directories": {
-          "dirs": [
-               "./test/",
-               "/Users/jonahschueller/Downloads/"
-          ]
-     },
-     "pdf": {
-          "rules": [
-               {
-                    "description":"Berechenbarkeit und Komplexität",
-                    "contains-keyword": [
-                         "(?=.*Berechenbarkeit)(?=.*Komplexität)",
-                         "BuK"
-                    ],
-                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/BuK"
-               }, {
-                    "contains-keyword": [
-                         "Softwaretechnik",
-                         "SoftwareEngineering",
-                         "SWT"
-                    ],
-                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/SWT"
-               }, {
-                    "contains-keyword": [
-                         "(?=.*Praktikum)(?=.*Systemprogrammierung)"
-                    ],
-                    "destination": "/Users/jonahschueller/Google Drive/RWTH/WiSe-19:20/PSP"
-               }
-          ]
-     },
-     "(txt|c)": {
-          "rules": [
-               {
-                    "contains-keyword": [
-                         "(Hello|Hallo)"
-                    ],
-                    "destination": "/Users/jonahschueller/development/python/FileMove"
-               },
-               {
-                    "contains-keyword": [
-                         "Hi"
-                    ],
-                    "destination": "/Users/jonahschueller/development/python/FileMove"
-               }
-          ]
-          
-     }
+   "observed-directories": {
+        "dirs": [
+             "/My/path/to/observe",
+             "/My/second/path/to/observe",
+             "..."
+        ]
+   },
+   "pdf": {
+    "rules": [
+      {
+        "active": true,
+        "description": "The description of my rule"
+        "contains-keyword": [
+          "regex for the text/ keywords to search for in the pdf file"
+        ],
+        "destination": "/My/destination/path/where/the/files/that/match/should/be/moved/to"
+      }
+    ]
+   },
+   "(jpg|jpeg|png)": {
+    "rules": [
+      {
+        "active": true,
+        "description": "The description of my rule"
+        "name-contains": [
+          "regex to match the file name"
+        ],
+        "destination": "/My/destination/path/where/the/files/that/match/should/be/moved/to"
+      }
+    ]
+   },
+   "some other regex to match the suffix of the added file": {
+    "rules": [
+      {
+        "active": false,
+        "description": "The description of my rule"
+        "name-contains": [
+          "regex to match the file name"
+        ],
+        "destination": "/My/destination/path/where/the/files/that/match/should/be/moved/to"
+      }
+    ]
+   }
 }
