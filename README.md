@@ -17,7 +17,7 @@
 - Put the code into a directory of your choice
 - create a file called **file-move.json**
 
-`
+```
 {
    "observed-directories": {
         "dirs": [
