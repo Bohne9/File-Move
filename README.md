@@ -9,7 +9,9 @@
 ## Requirements
 
 - python
-- 
+- `pip install tika`
+- `pip install watchdog`
+- `pip install shutil`
 
 ## Install & Setup
 
